@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mvc:View xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m"
+  xmlns:layout="sap.ui.layout"
+  xmlns:form="sap.ui.layout.form"
+  xmlns:table="sap.ui.table"
+  xmlns:core="sap.ui.core"
+  xmlns:richtexteditor="sap.ui.richtexteditor"
+  xmlns:viz="sap.viz.ui5"
+  controllerName="preview.app.controller.ErrorView"
+  displayBlock="true">
+  <App id="app">
+    <pages>
+      <Page title="ErrorView" enableScrolling="true">
+        <content>
+          <VBox alignItems="Center" justifyContent="Center" class="sapUiContentPadding">
+            <Title text="ErrorView" level="H1" class="sapUiMediumMarginBottom" />
+            <Text text="Converted from WebDynpro application" class="sapUiMediumMarginBottom" />
+            <m:Bar>
+              <contentMiddle>
+                <m:Text text="Example of properly structured Bar control" />
+              </contentMiddle>
+            </m:Bar>
+            <form:SimpleForm editable="true" layout="ResponsiveGridLayout">
+              <form:content>
+                <m:Label text="Sample Label" />
+                <m:Input value="Sample Value" />
+                <m:Label text="Another Label" />
+                <m:Input value="Another Value" />
+              </form:content>
+            </form:SimpleForm>
+          </VBox>
+        </content>
+      </Page>
+    </pages>
+  </App>
+</mvc:View>

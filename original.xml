@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebDynpro xmlns="http://www.sap.com/wd/webdynpro">
+  <View name="MasterDetailProductView">
+    <Title>Product Master-Detail View</Title>
+    <MatrixLayout id="masterDetailMatrix" width="100%" columns="2" rows="1">
+      <MatrixHeadData>
+        <TextView text="Product Catalog" design="H2" />
+        <TextView text="Product Details" design="H2" />
+      </MatrixHeadData>
+      <MatrixData>
+        <!-- Left side - Master View (Product List) -->
+        <GridLayout id="masterGrid" width="100%">
+          <RowLayout id="filterRow">
+            <Label text="Category:" />
+            <DropDownByKey id="categoryFilter" selectedKey="{/selectedCategory}">
+              <item key="ALL" text="All Categories" />
+              <item key="ELECTRONICS" text="Electronics" />
+              <item key="FURNITURE" text="Furniture" />
+              <item key="OFFICE" text="Office Supplies" />
+              <item key="APPAREL" text="Apparel" />
+              <item key="AUTOMOTIVE" text="Automotive" />
+            </DropDownByKey>
+            <Label text="Search:" />
+            <InputField id="searchField" placeholder="Enter product name..." value="{/searchText}" />
+            <Button text="Search" onAction="onSearch" />
+          </RowLayout>
+          
+          <RowLayout id="sortRow">
+            <Label text="Sort By:" />
+            <SegmentedButton id="sortButton" selectedKey="{/sortKey}">
+              <item key="NAME_ASC" text="Name (A-Z)" />
+              <item key="NAME_DESC" text="Name (Z-A)" />
+              <item key="PRICE_ASC" text="Price (Low-High)" />
+              <item key="PRICE_DESC" text="Price (High-Low)" />
+              <item key="POPULARITY" text="Popularity" />
+            </SegmentedButton>
+          </RowLayout>
+          
+          <RowLayout id="productListRow">
+            <Table id="productTable" selectionMode="SINGLE" width="100%" onSelectionChange="onProductSelected">
+              <TableColumn id="productIdColumn" width="100px">
+                <TextView text="Product ID" design="STANDARD" />
+                <TextView text="{/productId}" />
+              </TableColumn>
+              <TableColumn id="productNameColumn">
+                <TextView text="Product Name" design="STANDARD" />
+                <TextView text="{/productName}" />
+              </TableColumn>
+              <TableColumn id="productCategoryColumn" width="120px">
+                <TextView text="Category" design="STANDARD" />
+                <TextView text="{/category}" />
+              </TableColumn>
+              <TableColumn id="productPriceColumn" width="100px">
+                <TextView text="Price" design="STANDARD" />
+                <TextView text="{/price}" />
+              </TableColumn>
+              <TableColumn id="productStockColumn" width="100px">
+                <TextView text="Stock" design="STANDARD" />
+                <StatusIndicator value="{/stockStatus}" text="{/stockText}" />
+              </TableColumn>
+            </Table>
+          </RowLayout>
+          
+          <RowLayout id="paginationRow">
+            <Button text="<<" onAction="onFirstPage" />
+            <Button text="<" onAction="onPreviousPage" />
+            <TextView text="Page {/currentPage} of {/totalPages}" />
+            <Button text=">" onAction="onNextPage" />
+            <Button text=">>" onAction="onLastPage" />
+            <Label text="Items per page:" />
+            <DropDownByKey id="pageSizeDropdown" selectedKey="{/pageSize}">
+              <item key="10" text="10" />
+              <item key="25" text="25" />
+              <item key="50" text="50" />
+              <item key="100" text="100" />
+            </DropDownByKey>
+          </RowLayout>
+          
+          <RowLayout id="productCountRow">
+            <TextView text="Showing {/displayedProducts} of {/totalProducts} products" />
+          </RowLayout>
+        </GridLayout>
+        
+        <!-- Right side - Detail View (Product Details) -->
+        <GridLayout id="detailGrid" width="100%">
+          <RowLayout id="productHeaderRow">
+            <TextView id="selectedProductHeader" text="{/selectedProduct/productName}" design="H1" />
+            <TextView id="selectedProductId" text="Product ID: {/selectedProduct/productId}" design="STANDARD" />
+          </RowLayout>
+          
+          <RowLayout id="productImageRow">
+            <PhotoControl id="productImage" photoSource="{/selectedProduct/imageUrl}" width="300px" height="300px" />
+          </RowLayout>
+          
+          <RowLayout id="productPriceRow">
+            <TextView id="selectedProductPrice" text="{/selectedProduct/formattedPrice}" design="H2" textColor="#0000FF" />
+            <StatusIndicator id="selectedProductStatus" value="{/selectedProduct/statusCode}" text="{/selectedProduct/statusText}" />
+          </RowLayout>
+          
+          <TabStrip id="productDetailsTabStrip" selectedIndex="0" width="100%">
+            <tab text="General Information">
+              <FormContainer id="generalInfoForm">
+                <FormElement label="Product Name:">
+                  <TextView text="{/selectedProduct/productName}" design="STANDARD" />
+                </FormElement>
+                <FormElement label="Product ID:">
+                  <TextView text="{/selectedProduct/productId}" design="STANDARD" />
+                </FormElement>
+                <FormElement label="SKU:">
+                  <TextView text="{/selectedProduct/sku}" design="STANDARD" />
+                </FormElement>
+                <FormElement label="Category:">
+                  <TextView text="{/selectedProduct/category}" design="STANDARD" />
+                </FormElement>
+                <FormElement label="Subcategory:">
+                  <TextView text="{/selectedProduct/subcategory}" design="STANDARD" />
+                </FormElement>
+                <FormElement label="Brand:">
+                  <TextView text="{/selectedProduct/brand}" design="STANDARD" />
+                </FormElement>
+                <FormElement label="Model:">
+                  <TextView text="{/selectedProduct/model}" design="STANDARD" />
+                </FormElement>
+                <FormElement label="Release Date:">
+                  <TextView text="{/selectedProduct/releaseDate}" design="STANDARD" />
+                </FormElement>
+                <FormElement label="Description:">
+                  <TextArea id="productDescription" value="{/selectedProduct/description}" rows="4" editable="false" />
+                </FormElement>
+              </FormContainer>
+            </tab>
+            
+            <tab text="Technical Specifications">
+              <Table id="specificationsTable" selectionMode="NONE" width="100%">
+                <TableColumn id="specName">
+                  <TextView text="Specification" design="STANDARD" />
+                  <TextView text="{/name}" design="BOLD" />
+                </TableColumn>
+                <TableColumn id="specValue">
+                  <TextView text="Value" design="STANDARD" />
+                  <TextView text="{/value}" />
+                </TableColumn>
+                <TableColumn id="specUnit" width="100px">
+                  <TextView text="Unit" design="STANDARD" />
+                  <TextView text="{/unit}" />
+                </TableColumn>
+              </Table>
+            </tab>
+            
+            <tab text="Inventory">
+              <FormContainer id="inventoryForm">
+                <FormElement label="Stock Status:">
+                  <StatusIndicator value="{/selectedProduct/stockStatusCode}" text="{/selectedProduct/stockStatusText}" />
+                </FormElement>
+                <FormElement label="Available Quantity:">
+                  <TextView text="{/selectedProduct/availableQuantity}" design="STANDARD" />
+                </FormElement>
+                <FormElement label="Reserved Quantity:">
+                  <TextView text="{/selectedProduct/reservedQuantity}" design="STANDARD" />
+                </FormElement>
+                <FormElement label="Reorder Level:">
+                  <TextView text="{/selectedProduct/reorderLevel}" design="STANDARD" />
+                </FormElement>
+                <FormElement label="Reorder Quantity:">
+                  <TextView text="{/selectedProduct/reorderQuantity}" design="STANDARD" />
+                </FormElement>
+                <FormElement label="Lead Time:">
+                  <TextView text="{/selectedProduct/leadTime}" design="STANDARD" />
+                </FormElement>
+                <FormElement label="Warehouse Locations:">
+                  <Table id="warehouseLocationsTable" selectionMode="NONE" width="100%">
+                    <TableColumn id="warehouseColumn">
+                      <TextView text="Warehouse" design="STANDARD" />
+                      <TextView text="{/warehouse}" />
+                    </TableColumn>
+                    <TableColumn id="locationColumn">
+                      <TextView text="Location" design="STANDARD" />
+                      <TextView text="{/location}" />
+                    </TableColumn>
+                    <TableColumn id="quantityColumn" width="100px">
+                      <TextView text="Quantity" design="STANDARD" />
+                      <TextView text="{/quantity}" />
+                    </TableColumn>
+                  </Table>
+                </FormElement>
+              </FormContainer>
+            </tab>
+            
+            <tab text="Pricing">
+              <FormContainer id="pricingForm">
+                <FormElement label="List Price:">
+                  <TextView text="{/selectedProduct/listPrice}" design="STANDARD" />
+                </FormElement>
+                <FormElement label="Discount:">
+                  <TextView text="{/selectedProduct/discount}" design="STANDARD" textColor="#00AA00" />
+                </FormElement>
+                <FormElement label="Sale Price:">
+                  <TextView text="{/selectedProduct/salePrice}" design="BOLD" textColor="#0000FF" />
+                </FormElement>
+                <FormElement label="Tax Rate:">
+                  <TextView text="{/selectedProduct/taxRate}" design="STANDARD" />
+                </FormElement>
+                <FormElement label="Price History:">
+                  <Chart id="priceHistoryChart" type="LINE" width="100%" height="200px" title="Price History (Last 12 Months)">
+                    <ChartAxes>
+                      <ChartAxis position="BOTTOM" title="Month" />
+                      <ChartAxis position="LEFT" title="Price" />
+                    </ChartAxes>
+                    <ChartLegend position="BOTTOM" />
+                    <ChartSeries name="List Price" color="#1E90FF" />
+                    <ChartSeries name="Sale Price" color="#32CD32" />
+                  </Chart>
+                </FormElement>
+                <FormElement label="Volume Discounts:">
+                  <Table id="volumeDiscountsTable" selectionMode="NONE" width="100%">
+                    <TableColumn id="quantityRangeColumn">
+                      <TextView text="Quantity" design="STANDARD" />
+                      <TextView text="{/quantityRange}" />
+                    </TableColumn>
+                    <TableColumn id="discountPercentColumn">
+                      <TextView text="Discount %" design="STANDARD" />
+                      <TextView text="{/discountPercent}" />
+                    </TableColumn>
+                    <TableColumn id="unitPriceColumn">
+                      <TextView text="Unit Price" design="STANDARD" />
+                      <TextView text="{/unitPrice}" />
+                    </TableColumn>
+                  </Table>
+                </FormElement>
+              </FormContainer>
+            </tab>
+            
+            <tab text="Related Products">
+              <Table id="relatedProductsTable" selectionMode="SINGLE" width="100%" onSelectionChange="onRelatedProductSelected">
+                <TableColumn id="relatedProductImageColumn" width="80px">
+                  <TextView text="Image" design="STANDARD" />
+                  <PhotoControl photoSource="{/imageUrl}" width="60px" height="60px" />
+                </TableColumn>
+                <TableColumn id="relatedProductNameColumn">
+                  <TextView text="Product Name" design="STANDARD" />
+                  <TextView text="{/productName}" />
+                </TableColumn>
+                <TableColumn id="relatedProductCategoryColumn" width="120px">
+                  <TextView text="Category" design="STANDARD" />
+                  <TextView text="{/category}" />
+                </TableColumn>
+                <TableColumn id="relatedProductPriceColumn" width="100px">
+                  <TextView text="Price" design="STANDARD" />
+                  <TextView text="{/price}" />
+                </TableColumn>
+                <TableColumn id="relatedProductRelationColumn" width="120px">
+                  <TextView text="Relation Type" design="STANDARD" />
+                  <TextView text="{/relationType}" />
+                </TableColumn>
+                <TableColumn id="relatedProductActionsColumn" width="100px">
+                  <TextView text="Actions" design="STANDARD" />
+                  <Button text="View" onAction="onViewRelatedProduct" />
+                </TableColumn>
+              </Table>
+            </tab>
+            
+            <tab text="Customer Reviews">
+              <RowLayout id="reviewStatsRow">
+                <FormContainer id="reviewStatsForm" title="Review Summary">
+                  <FormElement label="Average Rating:">
+                    <FlowLayout>
+                      <TextView text="{/selectedProduct/averageRating}" design="H2" textColor="#0000FF" />
+                      <TextView text="out of 5" design="STANDARD" />
+                    </FlowLayout>
+                  </FormElement>
+                  <FormElement label="Rating Distribution:">
+                    <Table id="ratingDistributionTable" selectionMode="NONE" width="100%">
+                      <TableColumn id="starRatingColumn" width="100px">
+                        <TextView text="Rating" design="STANDARD" />
+                        <FlowLayout>
+                          <TextView text="{/stars}" />
+                          <TextView text=" stars" />
+                        </FlowLayout>
+                      </TableColumn>
+                      <TableColumn id="ratingCountColumn" width="100px">
+                        <TextView text="Count" design="STANDARD" />
+                        <TextView text="{/count}" />
+                      </TableColumn>
+                      <TableColumn id="ratingPercentColumn" width="100px">
+                        <TextView text="Percent" design="STANDARD" />
+                        <TextView text="{/percent}" />
+                      </TableColumn>
+                      <TableColumn id="ratingBarColumn">
+                        <TextView text="Distribution" design="STANDARD" />
+                        <ProgressIndicator value="{/percent}" maxValue="100" />
+                      </TableColumn>
+                    </Table>
+                  </FormElement>
+                  <FormElement label="Total Reviews:">
+                    <TextView text="{/selectedProduct/reviewCount}" design="STANDARD" />
+                  </FormElement>
+                </FormContainer>
+              </RowLayout>
+              
+              <RowLayout id="reviewListRow">
+                <Label text="Customer Reviews" design="H3" />
+                <Table id="reviewsTable" selectionMode="NONE" width="100%">
+                  <TableColumn id="reviewRatingColumn" width="100px">
+                    <TextView text="Rating" design="STANDARD" />
+                    <RatingIndicator value="{/rating}" maxValue="5" displayOnly="true" />
+                  </TableColumn>
+                  <TableColumn id="reviewTitleColumn" width="150px">
+                    <TextView text="Title" design="STANDARD" />
+                    <TextView text="{/title}" design="BOLD" />
+                  </TableColumn>
+                  <TableColumn id="reviewCommentColumn">
+                    <TextView text="Comment" design="STANDARD" />
+                    <TextView text="{/comment}" />
+                  </TableColumn>
+                  <TableColumn id="reviewCustomerColumn" width="150px">
+                    <TextView text="Customer" design="STANDARD" />
+                    <TextView text="{/customerName}" />
+                  </TableColumn>
+                  <TableColumn id="reviewDateColumn" width="120px">
+                    <TextView text="Date" design="STANDARD" />
+                    <TextView text="{/reviewDate}" />
+                  </TableColumn>
+                </Table>
+              </RowLayout>
+            </tab>
+          </TabStrip>
+          
+          <RowLayout id="productActionButtons">
+            <Button text="Add to Cart" design="EMPHASIZED" onAction="onAddToCart" />
+            <Button text="Add to Wishlist" onAction="onAddToWishlist" />
+            <Button text="Compare" onAction="onCompareProduct" />
+            <Button text="Print Details" onAction="onPrintProductDetails" />
+            <Button text="Share" onAction="onShareProduct" />
+          </RowLayout>
+        </GridLayout>
+      </MatrixData>
+    </MatrixLayout>
+  </View>
+  <Controller name="MasterDetailProductController">
+    <Method name="onSearch" />
+    <Method name="onProductSelected" />
+    <Method name="onFirstPage" />
+    <Method name="onPreviousPage" />
+    <Method name="onNextPage" />
+    <Method name="onLastPage" />
+    <Method name="onRelatedProductSelected" />
+    <Method name="onViewRelatedProduct" />
+    <Method name="onAddToCart" />
+    <Method name="onAddToWishlist" />
+    <Method name="onCompareProduct" />
+    <Method name="onPrintProductDetails" />
+    <Method name="onShareProduct" />
+    <Method name="wdDoInit" />
+  </Controller>
+</WebDynpro>
